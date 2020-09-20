@@ -1,0 +1,19 @@
+{
+  "name": "erminal",
+  "description": "A text mode UI for Jellyfish",
+  "author": "theLMGN",
+  "version": "1.0.0",
+  "main": "index.html",
+  "keywords": [
+    "jellyfish-ui"
+  ],
+  "license": "gpl-3.0",
+  "homepage": "https://github.com/Jellyfish-lsef/erminal#readme",
+  "bugs": {
+    "url": "https://github.com/Jellyfish-lsef/erminal/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jellyfish-lsef/erminal.git"
+  }
+}

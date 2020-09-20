@@ -1,0 +1,123 @@
+<html style="background: black;">
+    <head>
+        <title>Jellyfish Erminal</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <!-- without specifying charset monaco goes Â-->
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <script src="terminal.js"></script>
+      <style> a{color:#fff;}
+    
+
+::-webkit-scrollbar { 
+    display: none; 
+}</style>
+    </head>
+    <body style="margin: 0;">
+        
+        <script>
+            var term = new Terminal("terminal")
+            document.body.appendChild(term.html)
+            window.onresize = function() {
+                term.setWidth(window.innerWidth)
+                term.setHeight(window.innerHeight)
+            }
+            window.onresize()
+            function help() {
+                for (var c in cmds) {
+                    term.print("<b>" + c + "</b> <font color='#aaa'>" + cmds[c] + "</font>",true)
+                }
+            }
+
+            function inject() {
+                return new Promise((a,r) => {jellyfish.inject();window.enableInjectBtn = a })
+            }
+
+            function run(scr) {
+                return new Promise((a,r) => {
+                    jellyfish.getScript(jellyfish.joinPath(jellyfish.datadir,"Scripts", scr),function(e,s) {
+                        console.log(e,s)
+                        if (e) r(e);
+                        a(jellyfish.runScript(s))
+                    })
+                })
+            }
+            function cat(scr) {
+                return new Promise((a,r) => {
+                    jellyfish.getScript(jellyfish.joinPath(jellyfish.datadir,"Scripts", scr),function(e,s) {
+                        console.log(e,s)
+                        if (e) r(e);
+                        a(term.print(s.replace(/\r/g,"<br>")))
+                    })
+                })
+            }
+
+            function clickhandler(script) {
+                jellyfish.getScript(atob(script),function(e,s) {
+                    jellyfish.runScript(s)
+                })
+            }
+
+            function createScript(path,base) {
+                term.print(`<a href='javascript:clickhandler("${btoa(base)}")'>${path.dir}/${path.base}</a>`,true)
+            }
+            function ls() {
+                term.print("Click a script to run it.")
+                return new Promise((a,r) => {jellyfish.startCrawl();window.crawlFinished = a })
+            }
+
+            injectionStatusChange = term.print.bind(term)
+
+            function lsexploit() {
+                term.print(jellyfish.supportedExploits.join(", "))
+            }
+
+            var isTopmost = false;
+            function topmost() {
+                jellyfish.setTopmost(isTopmost = !isTopmost);
+            }
+            var cmds = {
+                inject: "injects using the currently selected exploit.",
+                "": "",
+                ls: "list all scripts",
+                run: "runs a script file",
+                cat: "prints the contents of a script to the console",
+                " ": "",
+                exec: "runs a single line of code",
+                "  ": "",
+                setExploit: "changes the exploit (use lsexploit to get the exploit id)",
+                lsexploit: "lists supported exploits",
+                setTheme: "changes the theme (you're using jellyfish-lsef/erminal, the default is jellyfish-lsef/jellyfish-ui)",
+                topmost: "toggles Jellyfish showing above all other windows",
+                help: "lists all commands",
+                close: "quits Jellyfish",
+            }
+            exec = jellyfish.runScript
+            var timeout = setTimeout(prompt,5000)
+            async function prompt() {
+                clearTimeout(timeout)
+                var text = await new Promise((a,r)=>{term.input("",a)})
+                var s = text.split(" ")
+                var command = s.shift()
+                var cmd = cmds[command]
+                if (!cmd) return prompt(term.print("Command " + command + " not found."))
+                try {
+                    await (window[command] || jellyfish[command] || term[command] )(s.join(" "))
+                } catch(e) {
+                    console.error(e)
+                    term.print("<font color=\"#f00\">There was an error.</font>",true)
+                    term.print(e.toString().replace(/\r/g,"<br>"))
+                }
+                return prompt()
+            }
+
+            function gotExploit() {
+                term.print("  ____   Jellyfish Erminal")
+                term.print(` /    \\  Jellyfish v${jellyfish.version}`)
+                term.print(`|______| Selected Exploit: ${jellyfish.exploit}`)
+                term.print(" ||||||  Type 'help' for commands")
+                prompt()
+            }
+            window.addEventListener("load",jellyfish.init)
+          </script>
+    </body>
+</html>
