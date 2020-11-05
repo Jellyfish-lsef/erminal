@@ -29,7 +29,7 @@
             }
 
             function inject() {
-                return new Promise((a,r) => {jellyfish.inject();window.enableInjectBtn = a })
+                return new Promise((a,r) => {jellyfish.inject(localStorage.getItem("usesAlternativeElevation") == "true");window.enableInjectBtn = a })
             }
 
             function run(scr) {
@@ -70,10 +70,18 @@
             function lsexploit() {
                 term.print(jellyfish.supportedExploits.join(", "))
             }
-
             var isTopmost = false;
             function topmost() {
                 jellyfish.setTopmost(isTopmost = !isTopmost);
+            }
+            function alternateInjection() {
+                if (localStorage.getItem("usesAlternativeElevation") == "true") {
+                    localStorage.setItem("usesAlternativeElevation", "false")
+                    term.print("Alternate injection is now off.")
+                } else {
+                    localStorage.setItem("usesAlternativeElevation", "true")
+                    term.print("Alternate injection is now on.")
+                }
             }
             var cmds = {
                 inject: "injects using the currently selected exploit.",
@@ -84,6 +92,7 @@
                 " ": "",
                 exec: "runs a single line of code",
                 "  ": "",
+                alternateInjection: "toggles alternate injection (macOS only)",
                 setExploit: "changes the exploit (use lsexploit to get the exploit id)",
                 lsexploit: "lists supported exploits",
                 setTheme: "changes the theme (you're using jellyfish-lsef/erminal, the default is jellyfish-lsef/jellyfish-ui)",
